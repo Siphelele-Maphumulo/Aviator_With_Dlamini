@@ -34,7 +34,7 @@ function createAirplaneMesh() {
 	var geomEngine = new THREE.BoxGeometry(20,50,50,1,1,1);
 	var matEngine = new THREE.MeshPhongMaterial({color:Colors.white, flatShading:true,});
 	var engine = new THREE.Mesh(geomEngine, matEngine);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	engine.position.x = 50;
 	engine.castShadow = true;
 	engine.receiveShadow = true;
@@ -44,7 +44,7 @@ function createAirplaneMesh() {
 	var geomTailPlane = new THREE.BoxGeometry(15,20,5,1,1,1);
 	var matTailPlane = new THREE.MeshPhongMaterial({color:Colors.red, flatShading:true,});
 	var tailPlane = new THREE.Mesh(geomTailPlane, matTailPlane);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	tailPlane.position.set(-40,20,0);
 	tailPlane.castShadow = true;
 	tailPlane.receiveShadow = true;
@@ -55,7 +55,7 @@ function createAirplaneMesh() {
 	var geomSideWing = new THREE.BoxGeometry(30,5,120,1,1,1);
 	var matSideWing = new THREE.MeshPhongMaterial({color:Colors.red, flatShading:true,});
 	var sideWing = new THREE.Mesh(geomSideWing, matSideWing);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	sideWing.position.set(0,15,0);
 	sideWing.castShadow = true;
 	sideWing.receiveShadow = true;
@@ -89,7 +89,7 @@ function createAirplaneMesh() {
 	var geomBlade = new THREE.BoxGeometry(1,80,10,1,1,1);
 	var matBlade = new THREE.MeshPhongMaterial({color:Colors.brownDark, flatShading:true,});
 	var blade1 = new THREE.Mesh(geomBlade, matBlade);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	blade1.position.set(8,0,0);
 
 	blade1.castShadow = true;
@@ -109,14 +109,14 @@ function createAirplaneMesh() {
 	var wheelProtecGeom = new THREE.BoxGeometry(30,15,10,1,1,1);
 	var wheelProtecMat = new THREE.MeshPhongMaterial({color:Colors.red, flatShading:true,});
 	var wheelProtecR = new THREE.Mesh(wheelProtecGeom,wheelProtecMat);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	wheelProtecR.position.set(25,-20,25);
 	mesh.add(wheelProtecR);
 
 	var wheelTireGeom = new THREE.BoxGeometry(24,24,4);
 	var wheelTireMat = new THREE.MeshPhongMaterial({color:Colors.brownDark, flatShading:true,});
 	var wheelTireR = new THREE.Mesh(wheelTireGeom,wheelTireMat);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	wheelTireR.position.set(25,-28,25);
 
 	var wheelAxisGeom = new THREE.BoxGeometry(10,10,6);
@@ -136,7 +136,7 @@ function createAirplaneMesh() {
 
 	var wheelTireB = wheelTireR.clone();
 	wheelTireB.scale.set(.5,.5,.5);
-	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ
+	//Ð¿Ð¾Ð·Ð¸Ñ†Ð¸Ñ 
 	wheelTireB.position.set(-35,-5,0);
 	mesh.add(wheelTireB);
 
@@ -366,7 +366,7 @@ class ModelManager {
 	}
 }
 
-const modelManager = new ModelManager('/models')
+const modelManager = new ModelManager('models')
 
 
 
@@ -864,7 +864,7 @@ class Airplane {
 		game.planeCollisionSpeedX = 100 * diffPos.x / d
 		game.planeCollisionSpeedY = 100 * diffPos.y / d
 		ambientLight.intensity = 2
-		audioManager.play('hit')
+		audioManager.play('airplane-crash')
 	}
 }
 
@@ -1281,8 +1281,6 @@ function spawnEnemies(count) {
 
 
 // COINS
-let moneyPlayedOnce = false
-
 class Coin {
 	constructor() {
 		var geom = new THREE.CylinderGeometry(4, 4, 1, 10)
@@ -1299,6 +1297,7 @@ class Coin {
 		sceneManager.add(this)
 	}
 
+
 	tick(deltaTime) {
 		rotateAroundSea(this, deltaTime, world.coinsSpeed)
 
@@ -1309,12 +1308,7 @@ class Coin {
 		if (utils.collide(airplane.mesh, this.mesh, world.coinDistanceTolerance)) {
 			spawnParticles(this.mesh.position.clone(), 5, COLOR_COINS, 0.8);
 			addCoin()
-			if (!moneyPlayedOnce) {
-				audioManager.play('money', {volume: 0.5})
-				moneyPlayedOnce = true
-			} else {
-				audioManager.play('coin', {volume: 0.5})
-			}
+			audioManager.play('coin', {volume: 0.5})
 			sceneManager.remove(this)
 		}
 		// passed-by?
@@ -1323,6 +1317,8 @@ class Coin {
 		}
 	}
 }
+
+
 
 function spawnCoins() {
 	const nCoins = 1 + Math.floor(Math.random()*10)
@@ -1479,7 +1475,7 @@ function loop() {
 			}
 
 			airplane.tick(deltaTime)
-			game.distance += game.speed * deltaTime * world.ratioSpeedDistance
+			game.distance = Math.max(0, game.distance + game.speed * deltaTime * world.ratioSpeedDistance);
 			game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02
 			game.speed = game.baseSpeed * game.planeSpeed
 			ui.updateDistanceDisplay()
@@ -1925,42 +1921,37 @@ function startMap() {
 
 
 
-function onWebsiteLoaded() {
+function onWebsiteLoaded(event) {
 	// load audio
-	audioManager.load('ocean', null, '/audio/ocean.mp3')
-	audioManager.load('ocean_1', null, '/audio/ocean_1.mp3')
-	audioManager.load('propeller', null, '/audio/propeller.mp3')
+	audioManager.load('ocean', null, 'audio/ocean.mp3')
+	audioManager.load('propeller', null, 'audio/propeller.mp3')
 
-	audioManager.load('money', 'coin', '/audio/money.mp3')
-	audioManager.load('coin-1', 'coin', '/audio/coin-1.mp3')
-	audioManager.load('coin-2', 'coin', '/audio/coin-2.mp3')
-	audioManager.load('coin-3', 'coin', '/audio/coin-3.mp3')
-	audioManager.load('jar-1', 'coin', '/audio/jar-1.mp3')
-	audioManager.load('jar-2', 'coin', '/audio/jar-2.mp3')
-	audioManager.load('jar-3', 'coin', '/audio/jar-3.mp3')
-	audioManager.load('jar-4', 'coin', '/audio/jar-4.mp3')
-	audioManager.load('jar-5', 'coin', '/audio/jar-5.mp3')
-	audioManager.load('jar-6', 'coin', '/audio/jar-6.mp3')
-	audioManager.load('jar-7', 'coin', '/audio/jar-7.mp3')
+	audioManager.load('coin-1', 'coin', 'audio/coin-1.mp3')
+	audioManager.load('coin-2', 'coin', 'audio/coin-2.mp3')
+	audioManager.load('coin-3', 'coin', 'audio/coin-3.mp3')
+	audioManager.load('jar-1', 'coin', 'audio/jar-1.mp3')
+	audioManager.load('jar-2', 'coin', 'audio/jar-2.mp3')
+	audioManager.load('jar-3', 'coin', 'audio/jar-3.mp3')
+	audioManager.load('jar-4', 'coin', 'audio/jar-4.mp3')
+	audioManager.load('jar-5', 'coin', 'audio/jar-5.mp3')
+	audioManager.load('jar-6', 'coin', 'audio/jar-6.mp3')
+	audioManager.load('jar-7', 'coin', 'audio/jar-7.mp3')
 
-	audioManager.load('airplane-crash-1', 'airplane-crash', '/audio/airplane-crash-1.mp3')
-	audioManager.load('airplane-crash-2', 'airplane-crash', '/audio/airplane-crash-2.mp3')
-	audioManager.load('airplane-crash-3', 'airplane-crash', '/audio/airplane-crash-3.mp3')
-	audioManager.load('hit', 'hit', '/audio/hit.mp3')
+	audioManager.load('airplane-crash-1', 'airplane-crash', 'audio/airplane-crash-1.mp3')
+	audioManager.load('airplane-crash-2', 'airplane-crash', 'audio/airplane-crash-2.mp3')
+	audioManager.load('airplane-crash-3', 'airplane-crash', 'audio/airplane-crash-3.mp3')
 
-	audioManager.load('bubble', 'bubble', '/audio/bubble.mp3')
+	audioManager.load('bubble', 'bubble', 'audio/bubble.mp3')
 
-	audioManager.load('shot-soft', 'shot-soft', '/audio/shot-soft.mp3')
-	audioManager.load('gun', 'gun', '/audio/gun.mp3') // load gun.mp3
+	audioManager.load('shot-soft', 'shot-soft', 'audio/shot-soft.mp3')
 
-	audioManager.load('shot-hard', 'shot-hard', '/audio/shot-hard.mp3')
-	audioManager.load('heavy_gun', 'heavy_gun', '/audio/heavy_gun.mp3') // load heavy_gun.mp3
+	audioManager.load('shot-hard', 'shot-hard', 'audio/shot-hard.mp3')
 
-	audioManager.load('bullet-impact', 'bullet-impact', '/audio/bullet-impact-rock.mp3')
+	audioManager.load('bullet-impact', 'bullet-impact', 'audio/bullet-impact-rock.mp3')
 
-	audioManager.load('water-splash', 'water-splash', '/audio/water-splash.mp3')
-	audioManager.load('rock-shatter-1', 'rock-shatter', '/audio/rock-shatter-1.mp3')
-	audioManager.load('rock-shatter-2', 'rock-shatter', '/audio/rock-shatter-2.mp3')
+	audioManager.load('water-splash', 'water-splash', 'audio/water-splash.mp3')
+	audioManager.load('rock-shatter-1', 'rock-shatter', 'audio/rock-shatter-1.mp3')
+	audioManager.load('rock-shatter-2', 'rock-shatter', 'audio/rock-shatter-2.mp3')
 
 	// load models
 	modelManager.load('heart')
@@ -1972,121 +1963,5 @@ function onWebsiteLoaded() {
 		})
 }
 
-// --- ocean music logic ---
-let oceanPlayedOnce = false
-
-function playOceanMusic() {
-	if (!oceanPlayedOnce) {
-		audioManager.play('ocean', {loop: false, volume: 1})
-		oceanPlayedOnce = true
-		// When ocean.mp3 ends, start looping ocean_1.mp3
-		const listener = audioManager.listener
-		const sound = new THREE.Audio(listener)
-		sound.setBuffer(audioManager.buffers['ocean'])
-		sound.setLoop(false)
-		sound.setVolume(1)
-		sound.play()
-		sound.onEnded = function() {
-			audioManager.play('ocean_1', {loop: true, volume: 1})
-		}
-	} else {
-		audioManager.play('ocean_1', {loop: true, volume: 1})
-	}
-}
-
-// --- gun sound logic ---
-let gunPlayedOnce = false
-function playGunSound() {
-	if (!gunPlayedOnce) {
-		audioManager.play('gun', {loop: false, volume: 1})
-		gunPlayedOnce = true
-	} else {
-		audioManager.play('shot-soft', {loop: false, volume: 1})
-	}
-}
-
-let heavyGunPlayedOnce = false
-function playHeavyGunSound() {
-	if (!heavyGunPlayedOnce) {
-		audioManager.play('heavy_gun', {loop: false, volume: 1})
-		heavyGunPlayedOnce = true
-	} else {
-		audioManager.play('shot-hard', {loop: false, volume: 1})
-	}
-}
-
-// Replace all audioManager.play('shot-soft') with playGunSound()
-// Replace all audioManager.play('shot-hard') with playHeavyGunSound()
-// For example, in SimpleGun and BetterGun classes, update shoot() methods accordingly.
-
-// Example for SimpleGun:
-SimpleGun.prototype.shoot = function(direction) {
-	const BULLET_SPEED = 0.5
-	const RECOIL_DISTANCE = 4
-	const RECOIL_DURATION = this.downtime() / 1.5
-
-	const position = new THREE.Vector3()
-	this.mesh.getWorldPosition(position)
-	position.add(new THREE.Vector3(5, 0, 0))
-	spawnProjectile(this.damage(), position, direction, BULLET_SPEED, 0.3, 3)
-
-	spawnParticles(position.clone().add(new THREE.Vector3(2,0,0)), 1, Colors.orange, 0.2)
-
-	playGunSound() // <-- use custom logic
-
-	const initialX = this.mesh.position.x
-	TweenMax.to(this.mesh.position, {
-		duration: RECOIL_DURATION/2,
-		x: initialX - RECOIL_DISTANCE,
-		onComplete: () => {
-			TweenMax.to(this.mesh.position, {
-				duration: RECOIL_DURATION/2,
-				x: initialX,
-			})
-		},
-	})
-}
-
-// Example for BetterGun:
-BetterGun.prototype.shoot = function(direction) {
-	const BULLET_SPEED = 0.5
-	const RECOIL_DISTANCE = 4
-	const RECOIL_DURATION = this.downtime() / 3
-
-	const position = new THREE.Vector3()
-	this.mesh.getWorldPosition(position)
-	position.add(new THREE.Vector3(12, 0, 0))
-	spawnProjectile(this.damage(), position, direction, BULLET_SPEED, 0.8, 6)
-
-	spawnParticles(position.clone().add(new THREE.Vector3(2,0,0)), 3, Colors.orange, 0.5)
-
-	playHeavyGunSound() // <-- use custom logic
-
-	const initialX = this.mesh.position.x
-	TweenMax.to(this.mesh.position, {
-		duration: RECOIL_DURATION,
-		x: initialX - RECOIL_DISTANCE,
-		onComplete: () => {
-			TweenMax.to(this.mesh.position, {
-				duration: RECOIL_DURATION,
-				x: initialX,
-			})
-		},
-	})
-}
-
-function startMap() {
-	if (!soundPlaying) {
-		playOceanMusic()
-		audioManager.play('propeller', {loop: true, volume: 1})
-		soundPlaying = true
-	}
-
-	createWorld()
-	loop()
-
-	ui.informNextLevel(1)
-	game.paused = false
-}
 
 window.addEventListener('load', onWebsiteLoaded, false)
