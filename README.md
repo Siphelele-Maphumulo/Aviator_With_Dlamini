@@ -1,10 +1,10 @@
 # The Aviator 2
 
-Updated version of Kaim Maaloul's The Aviator, and [GitHub](https://github.com/yakudoo/TheAviator).
+Updated version of Siphelele Maphumulo's The Aviator With Dlamini, and [GitHub](https://github.com/Siphelele-Maphumulo/Aviator_With_Dlamini/).
 
-![The Aviator 3](https://tympanus.net/codrops/wp-content/uploads/2022/04/Aviator2_featured.jpg)
+![The Aviator 3](https://raw.githubusercontent.com/Siphelele-Maphumulo/Aviator_With_Dlamini/refs/heads/master/shot.png)
 
-[Article on Codrops](https://tympanus.net/codrops/?p=63296)
+
 
 [Demo](https://tympanus.net/Tutorials/TheAviator2)
 
@@ -48,16 +48,11 @@ From freesound:
  - Sound "Coins - 01" by user "DWOBoyle" (https://freesound.org/people/DWOBoyle/sounds/140382/) licensed under Attribution 3.0
 
 
-## Misc
-
-Follow Michel: [Twitter](https://twitter.com/MichelOliverH)
-
-Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.io/Yakudoo/)
 
 
 ## Updates over the original
 
-**07 April 2022**
+**07 April 2025**
  - when replaying, remove all coins and enemies
  - fix bug about the state handling after dying
  - implement all audio
@@ -69,7 +64,7 @@ Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.i
       - collision with enemy
       - collecting a coin
 
-**06 April 2022**
+**06 April 2025**
  - airplane recoil
  - make end screen after 5 levels
  - make collectibles logic
@@ -78,7 +73,7 @@ Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.i
       - double gun: level 3
       - better gun: level 4
 
-**05 April 2022**
+**05 April 2025**
  - fix bug that no more enemies are spawning
  - transfer to new three.js version
  - design collectibles
@@ -88,7 +83,7 @@ Follow Karim: [Twitter](https://twitter.com/yakudoo), [Codepen](http://codepen.i
       - life
  - complete simple gun, better gun and double gun
 
-**04 April 2022**
+**04 April 2025**
  - design airplane's machine gun
  - redesign coins
  - each level has a different sea color
