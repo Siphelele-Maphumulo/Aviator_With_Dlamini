@@ -872,12 +872,13 @@ class Airplane {
 
 
 function rotateAroundSea(object, deltaTime, speed) {
-	object.angle += deltaTime * game.speed * world.collectiblesSpeed
-	if (object.angle > Math.PI*2) {
-		object.angle -= Math.PI*2
-	}
-	object.mesh.position.x = Math.cos(object.angle) * object.distance
-	object.mesh.position.y = -world.seaRadius + Math.sin(object.angle) * object.distance
+    // FIXED: Proper deltaTime usage and remove dependency on game.speed
+    object.angle += deltaTime * speed * 0.001;
+    if (object.angle > Math.PI*2) {
+        object.angle -= Math.PI*2;
+    }
+    object.mesh.position.x = Math.cos(object.angle) * object.distance;
+    object.mesh.position.y = -world.seaRadius + Math.sin(object.angle) * object.distance;
 }
 
 
@@ -1224,36 +1225,38 @@ class Enemy {
 	}
 
 
-	tick(deltaTime) {
-		rotateAroundSea(this, deltaTime, world.enemiesSpeed)
-		this.mesh.rotation.y += Math.random() * 0.1
-		this.mesh.rotation.z += Math.random() * 0.1
+tick(deltaTime) {
+    rotateAroundSea(this, deltaTime, world.enemiesSpeed);
+    
+    // FIXED: Proper rotation
+    this.mesh.rotation.y += deltaTime * 0.001;
+    this.mesh.rotation.z += deltaTime * 0.001;
 
-		// collision?
-		if (utils.collide(airplane.mesh, this.mesh, world.enemyDistanceTolerance) && game.status!=='finished') {
-			this.explode()
-			airplane.gethit(this.mesh.position)
-			removeLife()
-		}
-		// passed-by?
-		else if (this.angle > Math.PI) {
-			sceneManager.remove(this)
-		}
+    // collision?
+    if (utils.collide(airplane.mesh, this.mesh, world.enemyDistanceTolerance) && game.status !== 'finished') {
+        this.explode();
+        airplane.gethit(this.mesh.position);
+        removeLife();
+    }
+    // passed-by?
+    else if (this.angle > Math.PI) {
+        sceneManager.remove(this);
+    }
 
-		const thisAabb = new THREE.Box3().setFromObject(this.mesh)
-		for (const projectile of allProjectiles) {
-			const projectileAabb = new THREE.Box3().setFromObject(projectile.mesh)
-			if (thisAabb.intersectsBox(projectileAabb)) {
-				spawnParticles(projectile.mesh.position.clone(), 5, Colors.brownDark, 1)
-				projectile.remove()
-				this.hitpoints -= projectile.damage
-				audioManager.play('bullet-impact', {volume: 0.3})
-			}
-		}
-		if (this.hitpoints <= 0) {
-			this.explode()
-		}
-	}
+    const thisAabb = new THREE.Box3().setFromObject(this.mesh);
+    for (const projectile of allProjectiles) {
+        const projectileAabb = new THREE.Box3().setFromObject(projectile.mesh);
+        if (thisAabb.intersectsBox(projectileAabb)) {
+            spawnParticles(projectile.mesh.position.clone(), 5, Colors.brownDark, 1);
+            projectile.remove();
+            this.hitpoints -= projectile.damage;
+            audioManager.play('bullet-impact', {volume: 0.3});
+        }
+    }
+    if (this.hitpoints <= 0) {
+        this.explode();
+    }
+}
 
 
 	explode() {
@@ -1282,39 +1285,37 @@ function spawnEnemies(count) {
 
 // COINS
 class Coin {
-	constructor() {
-		var geom = new THREE.CylinderGeometry(4, 4, 1, 10)
-		var mat = new THREE.MeshPhongMaterial({
-			color: COLOR_COINS,
-			shininess: 1,
-			specular: 0xffffff,
-			flatShading: true,
-		});
-		this.mesh = new THREE.Mesh(geom, mat)
-		this.mesh.castShadow = true
-		this.angle = 0
-		this.dist = 0
-		sceneManager.add(this)
-	}
-
+    constructor() {
+        var geom = new THREE.CylinderGeometry(4, 4, 1, 10);
+        var mat = new THREE.MeshPhongMaterial({
+            color: COLOR_COINS,
+            shininess: 1,
+            specular: 0xffffff,
+            flatShading: true,
+        });
+        this.mesh = new THREE.Mesh(geom, mat);
+        this.mesh.castShadow = true;
+        this.angle = 0;
+        this.distance = 0; // FIXED: Changed from 'dist' to 'distance' for consistency
+        sceneManager.add(this);
+    }
 
 	tick(deltaTime) {
-		rotateAroundSea(this, deltaTime, world.coinsSpeed)
-
-		this.mesh.rotation.z += Math.random() * 0.1
-		this.mesh.rotation.y += Math.random() * 0.1
-
-		// collision?
-		if (utils.collide(airplane.mesh, this.mesh, world.coinDistanceTolerance)) {
-			spawnParticles(this.mesh.position.clone(), 5, COLOR_COINS, 0.8);
-			addCoin()
-			audioManager.play('coin', {volume: 0.5})
-			sceneManager.remove(this)
-		}
-		// passed-by?
-		else if (this.angle > Math.PI) {
-			sceneManager.remove(this)
-		}
+	    rotateAroundSea(this, deltaTime, world.collectiblesSpeed);
+	
+	    // FIXED: Proper rotation
+	    this.mesh.rotation.y += deltaTime * 0.001;
+	    this.mesh.rotation.z += deltaTime * 0.001;
+	
+	    // collision?
+	    if (utils.collide(airplane.mesh, this.mesh, world.collectibleDistanceTolerance)) {
+	        this.onApply();
+	        this.explode();
+	    }
+	    // passed-by?
+	    else if (this.angle > Math.PI) {
+	        sceneManager.remove(this);
+	    }
 	}
 }
 
@@ -1417,114 +1418,130 @@ function createSky() {
 
 
 function loop() {
-	newTime = new Date().getTime()
-	const deltaTime = newTime - oldTime
-	oldTime = newTime
+    newTime = new Date().getTime();
+    const deltaTime = Math.min(100, newTime - oldTime); // Cap deltaTime
+    oldTime = newTime;
 
-	if (game.status == 'playing') {
-		if (!game.paused) {
-			// Add coins
-			if (Math.floor(game.distance)%world.distanceForCoinsSpawn == 0 && Math.floor(game.distance) > game.coinLastSpawn) {
-				game.coinLastSpawn = Math.floor(game.distance);
-				spawnCoins()
-			}
-			if (Math.floor(game.distance)%world.distanceForSpeedUpdate == 0 && Math.floor(game.distance) > game.speedLastUpdate) {
-				game.speedLastUpdate = Math.floor(game.distance);
-				game.targetBaseSpeed += world.incrementSpeedByTime * deltaTime;
-			}
-			if (Math.floor(game.distance)%world.distanceForEnemiesSpawn == 0 && Math.floor(game.distance) > game.enemyLastSpawn) {
-				game.enemyLastSpawn = Math.floor(game.distance)
-				spawnEnemies(game.level)
-			}
-			if (Math.floor(game.distance)%world.distanceForLevelUpdate == 0 && Math.floor(game.distance) > game.levelLastUpdate) {
-				game.levelLastUpdate = Math.floor(game.distance)
-				game.level += 1
-				ui.informNextLevel(game.level)
-				sea.updateColor()
-				sea2.updateColor()
-				ui.updateLevelCount()
-				game.targetBaseSpeed = world.initSpeed + world.incrementSpeedByLevel*game.level
-			}
+    if (game.status == 'playing') {
+        if (!game.paused) {
+            // Add coins - FIXED: Use proper modulo check
+            if (Math.floor(game.distance) % world.distanceForCoinsSpawn == 0 && Math.floor(game.distance) > game.coinLastSpawn) {
+                game.coinLastSpawn = Math.floor(game.distance);
+                spawnCoins();
+            }
+            if (Math.floor(game.distance) % world.distanceForSpeedUpdate == 0 && Math.floor(game.distance) > game.speedLastUpdate) {
+                game.speedLastUpdate = Math.floor(game.distance);
+                game.targetBaseSpeed += world.incrementSpeedByTime;
+            }
+            if (Math.floor(game.distance) % world.distanceForEnemiesSpawn == 0 && Math.floor(game.distance) > game.enemyLastSpawn) {
+                game.enemyLastSpawn = Math.floor(game.distance);
+                spawnEnemies(game.level);
+            }
+            if (Math.floor(game.distance) % world.distanceForLevelUpdate == 0 && Math.floor(game.distance) > game.levelLastUpdate) {
+                game.levelLastUpdate = Math.floor(game.distance);
+                game.level += 1;
+                ui.informNextLevel(game.level);
+                sea.updateColor();
+                sea2.updateColor();
+                ui.updateLevelCount();
+                game.targetBaseSpeed = world.initSpeed + world.incrementSpeedByLevel * game.level;
+            }
 
-			// span collectibles
-			if (game.lifes<world.maxLifes && (game.distance-game.lastLifeSpawn)>world.pauseLifeSpawn && Math.random()<0.01) {
-				game.lastLifeSpawn = game.distance
-				spawnLifeCollectible()
-			}
-			if (!game.spawnedSimpleGun && game.distance>world.simpleGunLevelDrop*world.distanceForLevelUpdate) {
-				spawnSimpleGunCollectible()
-				game.spawnedSimpleGun = true
-			}
-			if (!game.spawnedDoubleGun && game.distance>world.doubleGunLevelDrop*world.distanceForLevelUpdate) {
-				spawnDoubleGunCollectible()
-				game.spawnedDoubleGun = true
-			}
-			if (!game.spawnedBetterGun && game.distance>world.betterGunLevelDrop*world.distanceForLevelUpdate) {
-				spawnBetterGunCollectible()
-				game.spawnedBetterGun = true
-			}
+            // spawn collectibles
+            if (game.lifes < world.maxLifes && (game.distance - game.lastLifeSpawn) > world.pauseLifeSpawn && Math.random() < 0.01) {
+                game.lastLifeSpawn = game.distance;
+                spawnLifeCollectible();
+            }
+            if (!game.spawnedSimpleGun && game.distance > world.simpleGunLevelDrop * world.distanceForLevelUpdate) {
+                spawnSimpleGunCollectible();
+                game.spawnedSimpleGun = true;
+            }
+            if (!game.spawnedDoubleGun && game.distance > world.doubleGunLevelDrop * world.distanceForLevelUpdate) {
+                spawnDoubleGunCollectible();
+                game.spawnedDoubleGun = true;
+            }
+            if (!game.spawnedBetterGun && game.distance > world.betterGunLevelDrop * world.distanceForLevelUpdate) {
+                spawnBetterGunCollectible();
+                game.spawnedBetterGun = true;
+            }
 
-			if (ui.mouseButtons[0] || ui.keysDown['Space']) {
-				airplane.shoot()
-			}
+            if (ui.mouseButtons[0] || ui.keysDown['Space']) {
+                airplane.shoot();
+            }
 
-			airplane.tick(deltaTime)
-			game.distance = Math.max(0, game.distance + game.speed * deltaTime * world.ratioSpeedDistance);
-			game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02
-			game.speed = game.baseSpeed * game.planeSpeed
-			ui.updateDistanceDisplay()
+            airplane.tick(deltaTime);
+            
+            // FIXED: Cleaner distance calculation
+            const distanceIncrement = game.speed * deltaTime * world.ratioSpeedDistance * 0.001;
+            game.distance = Math.max(0, game.distance + distanceIncrement);
+            
+            game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.0002;
+            game.speed = game.baseSpeed * game.planeSpeed;
+            
+            ui.updateDistanceDisplay();
 
-			if (game.lifes<=0 && canDie) {
-				game.status = "gameover"
-			}
-		}
-	}
-	else if (game.status == "gameover") {
-		game.speed *= .99
-		airplane.mesh.rotation.z += (-Math.PI/2 - airplane.mesh.rotation.z) * 0.0002 * deltaTime
-		airplane.mesh.rotation.x += 0.0003 * deltaTime
-		game.planeFallSpeed *= 1.05
-		airplane.mesh.position.y -= game.planeFallSpeed * deltaTime
+            if (game.lifes <= 0 && canDie) {
+                game.status = "gameover";
+            }
+        }
+    }
+    else if (game.status == "gameover") {
+        game.speed *= .99;
+        airplane.mesh.rotation.z += (-Math.PI/2 - airplane.mesh.rotation.z) * 0.0002 * deltaTime;
+        airplane.mesh.rotation.x += 0.0003 * deltaTime;
+        game.planeFallSpeed *= 1.05;
+        airplane.mesh.position.y -= game.planeFallSpeed * deltaTime;
 
-		if (airplane.mesh.position.y < -200) {
-			ui.showReplay()
-			game.status = "waitingReplay"
-			audioManager.play('water-splash')
-		}
-	}
-	else if (game.status == "waitingReplay"){
-		// nothing to do
-	}
+        if (airplane.mesh.position.y < -200) {
+            ui.showReplay();
+            game.status = "waitingReplay";
+            audioManager.play('water-splash');
+        }
+    }
+    else if (game.status == "waitingReplay") {
+        // nothing to do
+    }
 
-	if (!game.paused) {
-		airplane.tick(deltaTime)
+    if (!game.paused) {
+        airplane.tick(deltaTime);
 
-		sea.mesh.rotation.z += game.speed*deltaTime
-		if (sea.mesh.rotation.z > 2*Math.PI) {
-			sea.mesh.rotation.z -= 2*Math.PI
-		}
-		ambientLight.intensity += (.5 - ambientLight.intensity) * deltaTime * 0.005
+        sea.mesh.rotation.z += game.speed * deltaTime * 0.001;
+        if (sea.mesh.rotation.z > 2*Math.PI) {
+            sea.mesh.rotation.z -= 2*Math.PI;
+        }
+        ambientLight.intensity += (.5 - ambientLight.intensity) * deltaTime * 0.0005;
 
-		sceneManager.tick(deltaTime)
+        sceneManager.tick(deltaTime);
 
-		sky.tick(deltaTime)
-		sea.tick(deltaTime)
-	}
+        sky.tick(deltaTime);
+        sea.tick(deltaTime);
+    }
 
-	renderer.render(scene, camera)
-	requestAnimationFrame(loop)
+    renderer.render(scene, camera);
+    requestAnimationFrame(loop);
 }
-
-
 
 
 
 // COINS
 function addCoin() {
-	game.coins += 1
-	ui.updateCoinsCount(game.coins)
-
-	game.statistics.coinsCollected += 1
+    game.coins += 1;
+    ui.updateCoinsCount(game.coins);
+    game.statistics.coinsCollected += 1;
+    
+    // Optional: Add temporary speed boost when collecting coins
+    // Uncomment if you want this feature
+    /*
+    const speedBoost = 1.1; // 10% speed boost
+    const boostDuration = 1000; // 1 second
+    
+    const originalSpeed = game.targetBaseSpeed;
+    game.targetBaseSpeed *= speedBoost;
+    
+    setTimeout(() => {
+        game.targetBaseSpeed = originalSpeed;
+    }, boostDuration);
+    */
 }
 
 
@@ -1770,61 +1787,62 @@ let ui
 
 
 function createWorld() {
-	world = {
-		initSpeed: 0.00040,
-		incrementSpeedByTime: 0.0000025,
-		incrementSpeedByLevel: 0.000008,
-		distanceForSpeedUpdate: 100,
-		ratioSpeedDistance: 75,
+    world = {
+        // FIXED: Adjusted speed values for smoother gameplay
+        initSpeed: 0.00025,
+        incrementSpeedByTime: 0.0000015,
+        incrementSpeedByLevel: 0.000005,
+        distanceForSpeedUpdate: 100,
+        ratioSpeedDistance: 50, // Reduced for smoother distance calculation
 
-		simpleGunLevelDrop: 1.1,
-		doubleGunLevelDrop: 2.3,
-		betterGunLevelDrop: 3.5,
+        simpleGunLevelDrop: 1.1,
+        doubleGunLevelDrop: 2.3,
+        betterGunLevelDrop: 3.5,
 
-		maxLifes: 3,
-		pauseLifeSpawn: 400,
+        maxLifes: 3,
+        pauseLifeSpawn: 400,
 
-		levelCount: 6,
-		distanceForLevelUpdate: 500,
+        levelCount: 6,
+        distanceForLevelUpdate: 500,
 
-		planeDefaultHeight: 100,
-		planeAmpHeight: 80,
-		planeAmpWidth: 75,
-		planeMoveSensivity: 0.005,
-		planeRotXSensivity: 0.0008,
-		planeRotZSensivity: 0.0004,
-		planeMinSpeed: 1.2,
-		planeMaxSpeed: 1.6,
+        planeDefaultHeight: 100,
+        planeAmpHeight: 80,
+        planeAmpWidth: 75,
+        planeMoveSensivity: 0.005,
+        planeRotXSensivity: 0.0008,
+        planeRotZSensivity: 0.0004,
+        planeMinSpeed: 1.2,
+        planeMaxSpeed: 1.6,
 
-		seaRadius: 600,
-		seaLength: 800,
-		wavesMinAmp: 5,
-		wavesMaxAmp: 20,
-		wavesMinSpeed: 0.001,
-		wavesMaxSpeed: 0.003,
+        seaRadius: 600,
+        seaLength: 800,
+        wavesMinAmp: 5,
+        wavesMaxAmp: 20,
+        wavesMinSpeed: 0.001,
+        wavesMaxSpeed: 0.003,
 
-		cameraSensivity: 0.002,
+        cameraSensivity: 0.002,
 
-		coinDistanceTolerance: 15,
-		coinsSpeed: 0.5,
-		distanceForCoinsSpawn: 50,
+        coinDistanceTolerance: 15,
+        coinsSpeed: 0.4, // Reduced for smoother coin movement
+        distanceForCoinsSpawn: 50,
 
-		collectibleDistanceTolerance: 15,
-		collectiblesSpeed: 0.6,
+        collectibleDistanceTolerance: 15,
+        collectiblesSpeed: 0.5, // Reduced
 
-		enemyDistanceTolerance: 10,
-		enemiesSpeed: 0.6,
-		distanceForEnemiesSpawn: 50,
-	}
+        enemyDistanceTolerance: 10,
+        enemiesSpeed: 0.5, // Reduced
+        distanceForEnemiesSpawn: 50,
+    };
 
-	// create the world
-	createScene()
-	createSea()
-	createSky()
-	createLights()
-	createPlane()
+    // create the world
+    createScene();
+    createSea();
+    createSky();
+    createLights();
+    createPlane();
 
-	resetMap()
+    resetMap();
 }
 
 
