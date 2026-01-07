@@ -1439,17 +1439,11 @@ function loop() {
 			if (Math.floor(game.distance)%world.distanceForLevelUpdate == 0 && Math.floor(game.distance) > game.levelLastUpdate) {
 				game.levelLastUpdate = Math.floor(game.distance)
 				game.level += 1
-				if (game.level === world.levelCount) {
-					game.status = 'finished'
-					setFollowView()
-					ui.showScoreScreen()
-				} else {
-					ui.informNextLevel(game.level)
-					sea.updateColor()
-					sea2.updateColor()
-					ui.updateLevelCount()
-					game.targetBaseSpeed = world.initSpeed + world.incrementSpeedByLevel*game.level
-				}
+				ui.informNextLevel(game.level)
+				sea.updateColor()
+				sea2.updateColor()
+				ui.updateLevelCount()
+				game.targetBaseSpeed = world.initSpeed + world.incrementSpeedByLevel*game.level
 			}
 
 			// span collectibles
@@ -1777,11 +1771,11 @@ let ui
 
 function createWorld() {
 	world = {
-		initSpeed: 0.00035,
+		initSpeed: 0.00040,
 		incrementSpeedByTime: 0.0000025,
-		incrementSpeedByLevel: 0.000005,
+		incrementSpeedByLevel: 0.000008,
 		distanceForSpeedUpdate: 100,
-		ratioSpeedDistance: 50,
+		ratioSpeedDistance: 75,
 
 		simpleGunLevelDrop: 1.1,
 		doubleGunLevelDrop: 2.3,
