@@ -1,8 +1,8 @@
 # The Aviator 2
 
-Updated version of Siphelele Maphumulo's The Aviator With Dlamini, and [GitHub](https://github.com/yakudoo/TheAviator).
+Updated version of Siphelele Maphumulo's The Aviator With Dlamini, and [GitHub](https://github.com/Siphelele-Maphumulo/Aviator_With_Dlamini/).
 
-![The Aviator 3](https://tympanus.net/codrops/wp-content/uploads/2022/04/Aviator2_featured.jpg)
+![The Aviator 3](https://raw.githubusercontent.com/Siphelele-Maphumulo/Aviator_With_Dlamini/refs/heads/master/shot.png)
 
 
 
