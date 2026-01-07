@@ -1480,6 +1480,7 @@ function loop() {
 
 			airplane.tick(deltaTime)
 			game.distance += game.speed * deltaTime * world.ratioSpeedDistance
+			game.distance = Math.max(0, game.distance);
 			game.baseSpeed += (game.targetBaseSpeed - game.baseSpeed) * deltaTime * 0.02
 			game.speed = game.baseSpeed * game.planeSpeed
 			ui.updateDistanceDisplay()
