@@ -169,14 +169,12 @@ a:focus-visible {
 	position: relative;
 	padding: 0 1rem;
 	align-items: center;
-	position: relative;
 	display: grid;
-	padding: 0 1rem;
-	grid-template-columns: repeat(3,1fr);
+	grid-template-columns: 1fr;
 	grid-template-areas:
-	    'label label label'
-	    'value value value';
-	grid-column-gap: 2px;
+	    'label'
+	    'value';
+	justify-items: center;
 }
 
 .score__content--fixed {
@@ -203,6 +201,8 @@ a:focus-visible {
 	grid-area: value;
 	font-weight: bold;
 	color: var(--color-accent);
+	position: relative;
+	z-index: 1;
 }
 
 .score__value--level {
@@ -210,7 +210,12 @@ a:focus-visible {
 }
 
 .score__value--dist {
-	font-size: 1.85rem;
+	font-size: 1.5rem;
+	line-height: 1;
+}
+
+.score__value--coins {
+	font-size: 1.5rem;
 	line-height: 1;
 }
 
