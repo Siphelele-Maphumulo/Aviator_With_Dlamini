@@ -843,7 +843,7 @@ class Airplane {
 				// camera.setRotationFromEuler(new THREE.Euler(-1.490248, -1.4124514, -1.48923231))
 				// camera.updateProjectionMatrix ()
 			} else {
-				camera.fov = utils.normalize(ui.mousePos.x, -30, 1, 40, 80)
+				camera.fov = utils.normalize(ui.mousePos.x, -1, 1, 40, 80)
 				camera.updateProjectionMatrix()
 				camera.position.y += (this.mesh.position.y - camera.position.y) * deltaTime * world.cameraSensivity
 			}
